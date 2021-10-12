@@ -1,0 +1,21 @@
+@use '../styles/variables';
+
+.recipeName {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+
+  &:after {
+    position: absolute;
+    content: '';
+    height: 2px;
+    bottom: -4px;
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background: variables.$color-primary;
+  }
+}

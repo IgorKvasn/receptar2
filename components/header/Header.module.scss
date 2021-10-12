@@ -1,3 +1,11 @@
-.header {
-  color: #193d7b;
+@use '../../styles/variables';
+
+.headerAppName {
+  color: variables.$color-primary;
+  margin-bottom: 0.5em;
+
+  .icon {
+    color: variables.$color-accent;
+    margin-right: 0.5em;
+  }
 }

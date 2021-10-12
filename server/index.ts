@@ -13,6 +13,11 @@ const port = process.env.PORT || 3000;
 
     server.use(express.json());
 
+    //artificially delay all requests
+    /* server.use(function (req, res, next) {
+      setTimeout(next, 3000);
+    }); */
+
     server.use('/api', require('./api'));
 
     server.all('*', (req: Request, res: Response) => {

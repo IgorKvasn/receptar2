@@ -44,6 +44,16 @@ router.get('/recipes', function (req: Request, res: Response, next) {
   res.json(recipes);
 });
 
+router.get('/recipes/:id', function (req: Request, res: Response, next) {
+  let id = Number(req.params.id);
+  let rec = recipes.find((r) => r.id === id);
+  if (!rec) {
+    res.status(404).send('Recipe not found');
+  } else {
+    res.json(rec);
+  }
+});
+
 router.post('/recipes', function (req: Request, res: Response, next) {
   let newRecipe = req.body;
   recipes.push(newRecipe);
