@@ -1,8 +1,8 @@
 import { config, library } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 //   import { faGithub } from '@fortawesome/free-brands-svg-icons';
-import { faStar as farStar } from '@fortawesome/free-regular-svg-icons';
-import { faEdit, faCarrot, faStar } from '@fortawesome/free-solid-svg-icons';
+import { faStar as farStar, faSquare as farSquare, faCheckSquare as farCheckSquare } from '@fortawesome/free-regular-svg-icons';
+import { faEdit, faCarrot, faStar, faBroom as fasBroom } from '@fortawesome/free-solid-svg-icons';
 
 // See https://github.com/FortAwesome/react-fontawesome#integrating-with-other-tools-and-frameworks
 config.autoAddCss = false; // Tell Font Awesome to skip adding the CSS automatically since it's being imported above
@@ -26,7 +26,7 @@ config.autoAddCss = false; // Tell Font Awesome to skip adding the CSS automatic
 //   );
 
 // Import @fortawesome/free-regular-svg-icons
-library.add(farStar);
+library.add(farStar, farSquare, farCheckSquare);
 
 // Import @fortawesome/free-solid-svg-icons
-library.add(faEdit, faCarrot, faStar);
+library.add(faEdit, faCarrot, faStar, fasBroom);

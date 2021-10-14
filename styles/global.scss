@@ -1,6 +1,18 @@
+@import "bulma/sass/utilities/initial-variables";
+@import "bulma/sass/utilities/functions";
+
+@import "variables";
+
+$primary: $color-primary;
+
+
 @import 'bulma/sass/utilities/_all.sass';
 @import 'bulma/sass/base/_all';
 @import 'bulma/sass/elements/table';
+@import 'bulma/sass/elements/button';
+@import 'bulma/sass/elements/box';
+@import 'bulma/sass/components/navbar';
+
 
 body {
   margin: 2em;
@@ -12,4 +24,12 @@ h1 {
 
 h2 {
   font-size: 1.5em;
+}
+
+.button .icon{
+  vertical-align: middle;
+
+  & + span {
+    margin-left: 0.2em;
+  }
 }

@@ -6,12 +6,17 @@
   align-items: center;
   justify-content: space-between;
   position: relative;
+  margin-bottom: 2em;
+
+  h1 {
+    padding-bottom: .5em;
+  }
 
   &:after {
     position: absolute;
     content: '';
     height: 2px;
-    bottom: -4px;
+    bottom: 5px;
     margin: 0 auto;
     left: 0;
     right: 0;
@@ -19,3 +24,48 @@
     background: variables.$color-primary;
   }
 }
+
+.recipeDetail {
+  display: flex;
+  flex-direction: row;
+
+  .ingredients {
+    width: 10em;
+    min-width: 10em;
+
+    .cleanUpButton{
+      display: block;
+      margin: 3em auto 0;
+    }
+
+    svg {
+      height: 24px;
+    }
+
+    .ingredientItem {
+      margin-bottom: 10px;
+      cursor: pointer;
+
+      .ingredientVolume {
+        font-weight: bold;
+        margin-right: 1ch;
+      }
+
+      .ingredientsName {
+
+      }
+    }
+  }
+
+  .description {
+    //background-color: hsla(0, 0%, 90%, 1);
+    //margin-top: -1em;
+    //padding: 2em;
+    &:first-letter {
+      text-transform: uppercase;
+      font-size: 25px;
+      font-weight: bold;
+    }
+  }
+}
+

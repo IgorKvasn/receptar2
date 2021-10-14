@@ -1,5 +1,6 @@
 export class Ingredient {
   name: string;
-  volume: number;
+  amount: number;
   unit: 'g' | 'ml' | 'pcs';
+  selected?: boolean = false;
 }
