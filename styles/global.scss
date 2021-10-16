@@ -1,17 +1,5 @@
-@import "bulma/sass/utilities/initial-variables";
-@import "bulma/sass/utilities/functions";
-
 @import "variables";
-
-$primary: $color-primary;
-
-
-@import 'bulma/sass/utilities/_all.sass';
-@import 'bulma/sass/base/_all';
-@import 'bulma/sass/elements/table';
-@import 'bulma/sass/elements/button';
-@import 'bulma/sass/elements/box';
-@import 'bulma/sass/components/navbar';
+@import "bulma";
 
 
 body {
@@ -32,4 +20,8 @@ h2 {
   & + span {
     margin-left: 0.2em;
   }
+}
+
+table thead th > span + .icon{
+  margin-left: 1em;
 }

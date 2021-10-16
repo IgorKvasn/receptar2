@@ -1,5 +1,16 @@
+.filterWrapper{
+  display: flex;
+}
+
 .recipesTable {
-  tr {
+
+  thead{
+    .sortIcon{
+      cursor: pointer;
+    }
+  }
+
+  tbody tr {
     cursor: pointer;
   }
 }

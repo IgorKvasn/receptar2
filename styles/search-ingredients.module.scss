@@ -1,0 +1,45 @@
+@use 'variables';
+
+.searchBoxWrapper {
+
+  display:flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: .5em;
+  margin-bottom: 1em;
+
+  .searchBox {
+    width: 40em;
+
+    :global(.select__control){
+      height: 40px;
+    }
+  }
+
+  .buttonWrapper{
+    width: 7em;
+
+    :global(.button){
+      width: 100%;
+    }
+  }
+}
+
+.searchResultWrapper{
+  table {
+    tbody tr {
+      cursor: pointer;
+    }
+  }
+  .lastAllIngredientsRow{
+    border-bottom: 2px dashed variables.$color-accent;
+  }
+}
+
+@media all and (max-width: 830px){
+  .searchBoxWrapper {
+    .searchBox, .buttonWrapper {
+      width: 100%;
+    }
+  }
+}

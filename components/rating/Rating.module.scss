@@ -1,10 +1,46 @@
+@use "~bulma/sass/utilities/initial-variables" as bulmaVariables;
+$star-color: #c7a834;
+
 .wrapper {
-  display: flex;
-  flex-direction: row;
-  gap: 5px;
-  color: #c7a834;
+
+  @extend %rating-layout;
 
   &.editable{
     cursor: pointer;
+  }
+}
+
+.ratingChangeDropdown{
+  display: none;
+  flex-direction: column;
+  background-color: white;
+  z-index: 30;
+
+  padding: 10px;
+  padding-top: 1em;
+
+  &.visible{
+    display: flex;
+  }
+  .rating{
+    cursor: pointer;
+    @extend %rating-layout;
+    padding-block: .25em;
+    &:hover{
+      background-color: $star-color;
+      svg {
+        color: white;
+      }
+    }
+
+  }
+}
+
+%rating-layout{
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  svg {
+    color: $star-color;
   }
 }

@@ -1,0 +1,22 @@
+@import "variables";
+
+@import "bulma/sass/utilities/initial-variables";
+@import "bulma/sass/utilities/functions";
+
+
+
+$primary: $color-primary;
+$input-focus-border-color:$color-primary;
+
+@import 'bulma/sass/utilities/_all.sass';
+@import 'bulma/sass/base/_all';
+@import 'bulma/sass/elements/table';
+@import 'bulma/sass/elements/button';
+@import 'bulma/sass/elements/box';
+
+@import 'bulma/sass/components/navbar';
+@import 'bulma/sass/components/panel';
+
+@import 'bulma/sass/form/shared';
+@import 'bulma/sass/form/input-textarea';
+

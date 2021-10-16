@@ -1,23 +1,25 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { Recipe } from '../objects/recipe';
+import { removeAccents } from './string-utils';
 
 const router = require('express').Router();
 
 let recipes: Recipe[] = [
   {
     id: 1,
-    name: 'Ja som recept 1',
-    rating: 1,
+    name: 'aJa som recept 1',
+    rating: 3,
     createDate: new Date(),
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse est augue, iaculis id ex non, commodo ornare quam. Sed a ante euismod, auctor massa non, congue arcu. Curabitur placerat lectus sit amet erat porttitor viverra. Quisque molestie purus eu sem tincidunt, id luctus lacus ullamcorper. Phasellus sed efficitur nulla, quis laoreet lectus. Quisque commodo eros sed sagittis dignissim. Proin in orci lobortis, dapibus justo eu, faucibus metus. Nam porta ultrices risus, sed fermentum dui ultricies quis. Mauris aliquam dui sit amet orci fringilla, sed accumsan libero vulputate. Aliquam pretium mi vel justo tincidunt pulvinar. Duis quis erat sit amet enim iaculis iaculis sed ut massa. Duis ultricies quam nec purus sodales fringilla. Sed interdum egestas elit.',
+    description:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse est augue, iaculis id ex non, commodo ornare quam. Sed a ante euismod, auctor massa non, congue arcu. Curabitur placerat lectus sit amet erat porttitor viverra. Quisque molestie purus eu sem tincidunt, id luctus lacus ullamcorper. Phasellus sed efficitur nulla, quis laoreet lectus. Quisque commodo eros sed sagittis dignissim. Proin in orci lobortis, dapibus justo eu, faucibus metus. Nam porta ultrices risus, sed fermentum dui ultricies quis. Mauris aliquam dui sit amet orci fringilla, sed accumsan libero vulputate. Aliquam pretium mi vel justo tincidunt pulvinar. Duis quis erat sit amet enim iaculis iaculis sed ut massa. Duis ultricies quam nec purus sodales fringilla. Sed interdum egestas elit.',
     ingredients: [
       {
-        name: 'jablko',
+        name: 'JablKO',
         amount: 2,
         unit: 'pcs'
       },
       {
-        name: 'muka',
+        name: 'múka',
         amount: 1600,
         unit: 'g'
       }
@@ -25,10 +27,29 @@ let recipes: Recipe[] = [
   },
   {
     id: 2,
-    name: 'Ja som recept 2',
+    name: 'cJa som recept 2',
     createDate: new Date(),
-    rating: 0,
+    rating: 1,
     description: 'Druhy recept ...',
+    ingredients: [
+      {
+        name: 'voda',
+        amount: 200,
+        unit: 'ml'
+      },
+      {
+        name: 'jablko',
+        amount: 1000,
+        unit: 'g'
+      }
+    ]
+  },
+  {
+    id: 3,
+    name: 'bJa som recept 0',
+    createDate: new Date(),
+    rating: 2,
+    description: 'Nulty recept ...',
     ingredients: [
       {
         name: 'voda',
@@ -45,9 +66,57 @@ let recipes: Recipe[] = [
 ];
 
 router.get('/recipes', function (req: Request, res: Response, next) {
-  console.log('adad');
-  res.json(recipes);
+  let ingredients = req.query.ingredients as string[];
+  let result: Recipe[];
+  if (
+    ingredients === null ||
+    typeof ingredients === 'undefined' ||
+    ingredients.length === 0
+  ) {
+    result = recipes.sort((r1, r2) => {
+      return r1.id - r2.id;
+    });
+    res.json(result);
+  } else {
+    let result = recipes
+      .map((r) => {
+        let found = [];
+        ingredients.forEach((ingr) => {
+          let has = hasIngredientInRecipe(ingr, r);
+          if (has) {
+            found.push(ingr);
+          }
+        });
+        if (Object.keys(found).length > 0) {
+          return {
+            recipe: r,
+            found
+          };
+        } else {
+          return null;
+        }
+      })
+      .filter((o) => o !== null);
+    result = result.sort((r1, r2) => {
+      if (r2!.found.length === r1!.found.length) {
+        return r2.recipe.id - r1.recipe.id;
+      }
+      return r2!.found.length - r1!.found.length;
+    });
+    res.json(result);
+  }
 });
+
+function hasIngredientInRecipe(ingredient: string, recipe: Recipe): boolean {
+  return !!recipe.ingredients.find((ingr) => {
+    return normalizeString(ingr.name) === normalizeString(ingredient);
+  });
+}
+
+function normalizeString(text: string): string {
+  if (!text) return '';
+  return removeAccents(text.trim().toLowerCase());
+}
 
 router.get('/recipes/:id', function (req: Request, res: Response, next) {
   let id = Number(req.params.id);
@@ -59,16 +128,16 @@ router.get('/recipes/:id', function (req: Request, res: Response, next) {
   }
 });
 
-
 router.get('/ingredients', function (req: Request, res: Response, next) {
-  let allIngredients = recipes.flatMap(r=>r.ingredients);
-  let result = allIngredients.map(ingr=>ingr.name.toLowerCase()).reduce((total, value) => {
-    total[value] = (total[value] ?? 0) + 1;
-    return total;
-  }, {});
+  let allIngredients = recipes.flatMap((r) => r.ingredients);
+  let result = allIngredients
+    .map((ingr) => ingr.name.toLowerCase())
+    .reduce((total, value) => {
+      total[value] = (total[value] ?? 0) + 1;
+      return total;
+    }, {});
   res.json(result);
 });
-
 
 router.put('/recipes/:id', function (req: Request, res: Response, next) {
   let id = Number(req.params.id);
@@ -78,7 +147,7 @@ router.put('/recipes/:id', function (req: Request, res: Response, next) {
 });
 
 router.post('/recipes', function (req: Request, res: Response, next) {
-  let newRecipe = req.body;
+  let newRecipe = req.body as Recipe;
   recipes.push(newRecipe);
   res.json(recipes);
 });
