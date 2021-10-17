@@ -73,7 +73,17 @@ router.get('/recipes', function (req: Request, res: Response, next) {
     typeof ingredients === 'undefined' ||
     ingredients.length === 0
   ) {
-    result = recipes.sort((r1, r2) => {
+    //filter
+    let nameQuery = normalizeString((req.query.name as string) ?? '');
+    let result = recipes.filter((r) =>
+      normalizeString(r.name).includes(nameQuery)
+    );
+
+    //sort
+    let sortColumn = req.query.sortColumn;
+    let sortOrder = req.query.sortOrder;
+
+    result = result.sort((r1, r2) => {
       return r1.id - r2.id;
     });
     res.json(result);

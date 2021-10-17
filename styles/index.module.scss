@@ -1,5 +1,21 @@
 .filterWrapper{
-  display: flex;
+  display:flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: .5em;
+  margin-bottom: 1em;
+
+  .searchWrapper {
+    width: 40em;
+  }
+
+  .buttonWrapper{
+    width: 7em;
+
+    :global(.button){
+      width: 100%;
+    }
+  }
 }
 
 .recipesTable {
@@ -12,5 +28,13 @@
 
   tbody tr {
     cursor: pointer;
+  }
+}
+
+@media all and (max-width: 840px){
+  .filterWrapper {
+    .searchWrapper, .buttonWrapper {
+      width: 100%;
+    }
   }
 }

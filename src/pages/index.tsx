@@ -98,13 +98,21 @@ export default function ReceptarList({}: ReceptarListProps) {
       {recipes && (
         <>
           <div className={styles.filterWrapper}>
-            <input ref={searchInputElement} className='input' />
-            <button className='button is-primary' onClick={() => onSearch()}>
-              <span className='icon'>
-                <FontAwesomeIcon icon={['fas', 'search']} />
-              </span>
-              <span>Hľadaj</span>
-            </button>
+            <div className={styles.searchWrapper}>
+              <input
+                ref={searchInputElement}
+                className='input'
+                placeholder={'Hľadaj názov'}
+              />
+            </div>
+            <div className={styles.buttonWrapper}>
+              <button className='button is-primary' onClick={() => onSearch()}>
+                <span className='icon'>
+                  <FontAwesomeIcon icon={['fas', 'search']} />
+                </span>
+                <span>Hľadaj</span>
+              </button>
+            </div>
           </div>
 
           <table
