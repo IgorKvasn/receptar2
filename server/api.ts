@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
 import { Recipe } from '../objects/recipe';
 import { removeAccents } from './string-utils';
+import { createRecipe, findAllUsers, loginUser } from './db';
 
 const router = require('express').Router();
 
 let recipes: Recipe[] = [
   {
-    id: 1,
+    id: '1',
     name: 'aJa som recept 1',
     rating: 3,
     createDate: new Date(),
@@ -26,7 +27,7 @@ let recipes: Recipe[] = [
     ]
   },
   {
-    id: 2,
+    id: '2',
     name: 'cJa som recept 2',
     createDate: new Date(),
     rating: 1,
@@ -45,7 +46,7 @@ let recipes: Recipe[] = [
     ]
   },
   {
-    id: 3,
+    id: '3',
     name: 'bJa som recept 0',
     createDate: new Date(),
     rating: 2,
@@ -84,7 +85,7 @@ router.get('/recipes', function (req: Request, res: Response, next) {
     let sortOrder = req.query.sortOrder;
 
     result = result.sort((r1, r2) => {
-      return r1.id - r2.id;
+      return r1.id.localeCompare(r2.id);
     });
     res.json(result);
   } else {
@@ -109,7 +110,7 @@ router.get('/recipes', function (req: Request, res: Response, next) {
       .filter((o) => o !== null);
     result = result.sort((r1, r2) => {
       if (r2!.found.length === r1!.found.length) {
-        return r2.recipe.id - r1.recipe.id;
+        return r2.recipe.id.localeCompare(r1.recipe.id);
       }
       return r2!.found.length - r1!.found.length;
     });
@@ -129,7 +130,7 @@ function normalizeString(text: string): string {
 }
 
 router.get('/recipes/:id', function (req: Request, res: Response, next) {
-  let id = Number(req.params.id);
+  let id = String(req.params.id);
   let rec = recipes.find((r) => r.id === id);
   if (!rec) {
     res.status(404).send('Recipe not found');
@@ -150,7 +151,7 @@ router.get('/ingredients', function (req: Request, res: Response, next) {
 });
 
 router.put('/recipes/:id', function (req: Request, res: Response, next) {
-  let id = Number(req.params.id);
+  let id = String(req.params.id);
   let recIndex = recipes.findIndex((r) => r.id === id);
   recipes.splice(recIndex, 1, req.body);
   res.json(recipes);
@@ -160,6 +161,21 @@ router.post('/recipes', function (req: Request, res: Response, next) {
   let newRecipe = req.body as Recipe;
   recipes.push(newRecipe);
   res.json(recipes);
+});
+
+router.get('/test', async function (req: Request, res: Response, next) {
+  debugger;
+  let user1 = await loginUser('igor', 'heslo');
+  console.log('user1', user1);
+  debugger;
+  let user2 = await loginUser('igor', 'heslo2');
+  debugger;
+  let user3 = await loginUser('igor3', 'heslo');
+  debugger;
+  let users = await findAllUsers();
+  // console.log('users', users);
+  debugger;
+  res.json({ ok: 1 });
 });
 
 module.exports = router;

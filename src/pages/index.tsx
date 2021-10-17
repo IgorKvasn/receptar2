@@ -88,7 +88,7 @@ export default function ReceptarList({}: ReceptarListProps) {
 
   function onSearch() {
     let query = searchInputElement.current.value;
-    console.log('searching', query);
+    alert('searching ' + query);
   }
 
   return (
