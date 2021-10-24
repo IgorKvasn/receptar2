@@ -1,6 +1,9 @@
 import express, { Request, Response } from 'express';
+import cors from 'cors';
 import next from 'next';
 import mongoose from 'mongoose';
+import basicAuth from 'express-basic-auth';
+import { auth } from './auth';
 
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
@@ -18,6 +21,17 @@ const port = process.env.PORT || 3000;
     /* server.use(function (req, res, next) {
       setTimeout(next, 3000);
     }); */
+
+    server.use(cors());
+
+    server.use(
+      basicAuth({
+        authorizer: auth,
+        authorizeAsync: true,
+        challenge: true,
+        realm: 'ReceptarRealm'
+      })
+    );
 
     server.use('/api', require('./api'));
 
@@ -40,6 +54,7 @@ const port = process.env.PORT || 3000;
     });
 
     //--------
+
     server.listen(port, (err?: any) => {
       if (err) throw err;
       console.log(`> Ready on localhost:${port} - env ${process.env.NODE_ENV}`);

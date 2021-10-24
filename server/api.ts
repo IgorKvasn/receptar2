@@ -1,7 +1,13 @@
 import { Request, Response } from 'express';
 import { Recipe } from '../objects/recipe';
 import { removeAccents } from './string-utils';
-import { createRecipe, findAllUsers, loginUser } from './db';
+import {
+  createRecipe,
+  findAllUsers,
+  findRecipesForUser,
+  findUserByUsernameAndPass,
+  SortInfo
+} from './db';
 
 const router = require('express').Router();
 
@@ -66,8 +72,26 @@ let recipes: Recipe[] = [
   }
 ];
 
-router.get('/recipes', function (req: Request, res: Response, next) {
-  let ingredients = req.query.ingredients as string[];
+router.get('/recipes', async function (req: Request, res: Response, next) {
+  // @ts-ignore
+  let user = req.auth.user;
+
+  let sortColumn = req.query.sortColumn;
+  let sortOrder = req.query.sortOrder;
+
+  let sort = sortColumn
+    ? [
+        {
+          property: sortColumn as string,
+          direction: sortOrder as 'ASC' | 'DESC' | 'null'
+        } as SortInfo
+      ]
+    : null;
+
+  let recipes = await findRecipesForUser(user, sort);
+  res.json(recipes);
+
+  /* let ingredients = req.query.ingredients as string[];
   let result: Recipe[];
   if (
     ingredients === null ||
@@ -115,7 +139,7 @@ router.get('/recipes', function (req: Request, res: Response, next) {
       return r2!.found.length - r1!.found.length;
     });
     res.json(result);
-  }
+  }*/
 });
 
 function hasIngredientInRecipe(ingredient: string, recipe: Recipe): boolean {
@@ -165,12 +189,12 @@ router.post('/recipes', function (req: Request, res: Response, next) {
 
 router.get('/test', async function (req: Request, res: Response, next) {
   debugger;
-  let user1 = await loginUser('igor', 'heslo');
+  let user1 = await findUserByUsernameAndPass('igor', 'heslo');
   console.log('user1', user1);
   debugger;
-  let user2 = await loginUser('igor', 'heslo2');
+  let user2 = await findUserByUsernameAndPass('igor', 'heslo2');
   debugger;
-  let user3 = await loginUser('igor3', 'heslo');
+  let user3 = await findUserByUsernameAndPass('igor3', 'heslo');
   debugger;
   let users = await findAllUsers();
   // console.log('users', users);

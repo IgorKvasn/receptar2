@@ -1,28 +1,12 @@
 @use '../styles/variables';
 
 .recipeName {
-  width: 100%;
+  width: 60em;
   display: flex;
   align-items: center;
   justify-content: space-between;
   position: relative;
-  margin-bottom: 2em;
-
-  h1 {
-    padding-bottom: .5em;
-  }
-
-  &:after {
-    position: absolute;
-    content: '';
-    height: 2px;
-    bottom: 5px;
-    margin: 0 auto;
-    left: 0;
-    right: 0;
-    width: 100%;
-    background: variables.$color-primary;
-  }
+  border-bottom: 2px solid variables.$color-primary;;
 }
 
 .recipeDetail {

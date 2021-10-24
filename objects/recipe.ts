@@ -7,6 +7,6 @@ export class Recipe {
   name: string;
   rating: RecipeRating;
   description: string;
-  ingredients: Ingredient[];
+  ingredients: Ingredient[] = [];
   createDate: Date;
 }

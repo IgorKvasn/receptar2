@@ -9,6 +9,7 @@ import { Rating } from '../../components/rating/Rating';
 import { useAppDispatch, useAppSelector } from '../redux/redux-hooks';
 import { addAllRecipes, reorderRecipes } from '../redux/slices/recipesSlice';
 import { formatDate } from '../../utils/date-utils';
+import { NEW_RECIPE_PAGE } from './detail/[recipeId]';
 
 interface ReceptarListProps {}
 
@@ -32,14 +33,22 @@ export default function ReceptarList({}: ReceptarListProps) {
   useEffect(() => {
     setLoading(true);
     axios
-      .get(getApiUrl('/recipes'))
+      .get(
+        getApiUrl(
+          `/recipes?${
+            sortInfo !== null
+              ? `sortColumn=${sortInfo.column}&sortOrder=${sortInfo.order}`
+              : ''
+          }`
+        )
+      )
       .then((response) => {
         dispatch(addAllRecipes(response.data));
       })
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  }, [sortInfo]);
 
   function navigateToRecipe(recipe: Recipe) {
     router.push(`/detail/${recipe.id}`);
@@ -67,13 +76,6 @@ export default function ReceptarList({}: ReceptarListProps) {
     }
   }
 
-  useEffect(() => {
-    if (!recipes) {
-      return;
-    }
-    dispatch(reorderRecipes(sortInfo));
-  }, [sortInfo]);
-
   function getSortIcon(column: keyof Recipe): JSX.Element {
     if (sortInfo.column !== column || sortInfo.order === null) {
       return <FontAwesomeIcon icon={['fas', 'sort']} />;
@@ -91,10 +93,13 @@ export default function ReceptarList({}: ReceptarListProps) {
     alert('searching ' + query);
   }
 
+  function addRecipe() {
+    router.push(`/detail/${NEW_RECIPE_PAGE}`);
+  }
+
   return (
     <>
       {loading ? <div>Získavam recepty</div> : ''}
-      {recipes?.length === 0 ? <div>Žiadne recepty</div> : ''}
       {recipes && (
         <>
           <div className={styles.filterWrapper}>
@@ -112,6 +117,15 @@ export default function ReceptarList({}: ReceptarListProps) {
                 </span>
                 <span>Hľadaj</span>
               </button>
+              <button
+                className='button is-primary is-light'
+                onClick={() => addRecipe()}
+              >
+                <span className='icon'>
+                  <FontAwesomeIcon icon={['fas', 'plus']} />
+                </span>
+                <span>Nový recept</span>
+              </button>
             </div>
           </div>
 
@@ -121,19 +135,28 @@ export default function ReceptarList({}: ReceptarListProps) {
             <thead>
               <tr>
                 <th></th>
-                <th onClick={() => sortColumn('name')}>
+                <th
+                  className={styles.sortableColumn}
+                  onClick={() => sortColumn('name')}
+                >
                   <span>Názov</span>
                   <span className={`icon ${styles.sortIcon}`}>
                     {getSortIcon('name')}
                   </span>
                 </th>
-                <th onClick={() => sortColumn('rating')}>
+                <th
+                  className={styles.sortableColumn}
+                  onClick={() => sortColumn('rating')}
+                >
                   <span>Rating</span>
                   <span className={`icon ${styles.sortIcon}`}>
                     {getSortIcon('rating')}
                   </span>
                 </th>
-                <th onClick={() => sortColumn('createDate')}>
+                <th
+                  className={styles.sortableColumn}
+                  onClick={() => sortColumn('createDate')}
+                >
                   <span>Dátum vytvorenia</span>
                   <span className={`icon ${styles.sortIcon}`}>
                     {getSortIcon('createDate')}
@@ -159,6 +182,13 @@ export default function ReceptarList({}: ReceptarListProps) {
             </tbody>
           </table>
         </>
+      )}
+      {recipes?.length === 0 ? (
+        <div className={styles.noRecipesNote}>
+          <i>Žiadne recepty</i>
+        </div>
+      ) : (
+        ''
       )}
     </>
   );

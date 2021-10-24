@@ -6,21 +6,25 @@
   margin-bottom: 1em;
 
   .searchWrapper {
-    width: 40em;
+    width: 33em;
   }
 
   .buttonWrapper{
-    width: 7em;
+    width: 14em;
+    display: flex;
+    gap: .5em;
 
-    :global(.button){
-      width: 100%;
-    }
   }
 }
 
 .recipesTable {
 
   thead{
+
+    .sortableColumn{
+      cursor: pointer;
+    }
+
     .sortIcon{
       cursor: pointer;
     }
@@ -29,6 +33,13 @@
   tbody tr {
     cursor: pointer;
   }
+}
+
+.noRecipesNote{
+  display: flex;
+  font-weight: bold;
+  text-transform: uppercase;
+  justify-content: center;
 }
 
 @media all and (max-width: 840px){

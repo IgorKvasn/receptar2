@@ -15,6 +15,9 @@ import {
 } from '../../redux/slices/recipeDetailSlice';
 import { PayloadAction } from '@reduxjs/toolkit';
 import { useAfterReduxMutate } from '../../../utils/hooks';
+import { RecipeHeader } from '../../../components/recipe/header';
+
+export const NEW_RECIPE_PAGE = 'new';
 
 export interface ReceptarDetailProps {}
 
@@ -24,12 +27,20 @@ export default function ReceptarDetail({}: ReceptarDetailProps) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const { recipeId } = router.query;
+  const [recipeModel, setRecipeModel] = useState<Recipe>();
+
   const mutateRecipe = useAfterReduxMutate(() => {
     axios.put(getApiUrl(`/recipes/${recipeId}`), recipe).then((response) => {});
+    setRecipeModel(recipe);
   }, [recipe]);
 
   useEffect(() => {
     if (recipeId === null || typeof recipeId === 'undefined') {
+      return;
+    }
+
+    if (isNewRecipe()) {
+      setRecipeModel(new Recipe());
       return;
     }
 
@@ -44,6 +55,10 @@ export default function ReceptarDetail({}: ReceptarDetailProps) {
       });
   }, [recipeId]);
 
+  function isNewRecipe() {
+    return recipeId === NEW_RECIPE_PAGE;
+  }
+
   function ingredientClicked(recipe: Recipe, ingrIndex: number) {
     mutateRecipe(toggleIngredient(ingrIndex));
   }
@@ -56,29 +71,40 @@ export default function ReceptarDetail({}: ReceptarDetailProps) {
     mutateRecipe(setRecipeRating(rating));
   }
 
+  function addIngredient() {
+    alert('TODO pridavanie suroviny');
+  }
+
   return (
     <>
-      {loading ? 'loading' : 'not loading'}
-      {!loading && recipe && (
+      {!isNewRecipe() && loading ? 'loading' : 'not loading'}
+
+      {recipeModel && (
         <>
           <div className={styles.recipeName}>
-            <h1>{recipe.name}</h1>
-            <Rating
-              rating={recipe.rating}
-              editable={true}
-              onRatingSelected={(rating) => onRatingSelected(rating)}
-            />
+            <RecipeHeader
+              value={recipeModel.name}
+              editable={isNewRecipe()}
+              onConfirm={(value) => alert('saving header' + value)}
+            ></RecipeHeader>
+            {!isNewRecipe() && (
+              <Rating
+                rating={recipeModel.rating}
+                editable={true}
+                onRatingSelected={(rating) => onRatingSelected(rating)}
+              />
+            )}
           </div>
 
           <div className={styles.recipeDetail}>
             <div className={styles.ingredients}>
               <ul className={`fa-ul`}>
-                {recipe.ingredients.map((ingr, ingrIndex) => {
+                {recipeModel.ingredients.map((ingr, ingrIndex) => {
                   return (
                     <li
                       className={styles.ingredientItem}
                       key={`${ingr.amount}-${ingr.unit}-${ingr.name}`}
-                      onClick={() => ingredientClicked(recipe, ingrIndex)}
+                      onClick={() => ingredientClicked(recipeModel, ingrIndex)}
                     >
                       {ingr.selected ? (
                         <FontAwesomeIcon
@@ -99,18 +125,32 @@ export default function ReceptarDetail({}: ReceptarDetailProps) {
                   );
                 })}
               </ul>
-              <button
-                onClick={() => clearAllIngredients()}
-                className={`button is-primary ${styles.cleanUpButton}`}
-              >
-                <span className='icon'>
-                  <FontAwesomeIcon icon={['fas', 'broom']} />
-                </span>
-                <span>Vyčisti</span>
-              </button>
+
+              {!isNewRecipe() && (
+                <button
+                  onClick={() => clearAllIngredients()}
+                  className={`button is-primary ${styles.cleanUpButton}`}
+                >
+                  <span className='icon'>
+                    <FontAwesomeIcon icon={['fas', 'broom']} />
+                  </span>
+                  <span>Vyčisti</span>
+                </button>
+              )}
+              {isNewRecipe() && (
+                <button
+                  onClick={() => addIngredient()}
+                  className={`button is-primary ${styles.cleanUpButton}`}
+                >
+                  <span className='icon'>
+                    <FontAwesomeIcon icon={['fas', 'plus']} />
+                  </span>
+                  <span>Pridať surovinu</span>
+                </button>
+              )}
             </div>
             <div className={`${styles.description} box`}>
-              {recipe.description}
+              {recipeModel.description}
             </div>
           </div>
         </>

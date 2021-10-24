@@ -14,7 +14,11 @@ import {
   faSearch as fasSearch,
   faSort as fasSort,
   faSortDown as fasSortDown,
-  faSortUp as fasSortUp
+  faSortUp as fasSortUp,
+  faPlus as fasPlus,
+  faCheck as fasCheck,
+  faTimes as fasTimes,
+  faPen as fasPen
 } from '@fortawesome/free-solid-svg-icons';
 
 // See https://github.com/FortAwesome/react-fontawesome#integrating-with-other-tools-and-frameworks
@@ -50,5 +54,9 @@ library.add(
   fasSearch,
   fasSort,
   fasSortUp,
-  fasSortDown
+  fasSortDown,
+  fasPlus,
+  fasCheck,
+  fasTimes,
+  fasPen
 );
