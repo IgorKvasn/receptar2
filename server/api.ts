@@ -12,6 +12,7 @@ import {
 const router = require('express').Router();
 
 let recipes: Recipe[] = [
+  /*
   {
     id: '1',
     name: 'aJa som recept 1',
@@ -69,7 +70,7 @@ let recipes: Recipe[] = [
         unit: 'g'
       }
     ]
-  }
+  }*/
 ];
 
 router.get('/recipes', async function (req: Request, res: Response, next) {

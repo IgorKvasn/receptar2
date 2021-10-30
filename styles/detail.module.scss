@@ -1,7 +1,6 @@
 @use '../styles/variables';
 
 .recipeName {
-  width: 60em;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -12,10 +11,11 @@
 .recipeDetail {
   display: flex;
   flex-direction: row;
+  column-gap: 2em;
+  margin-top: 1em;
 
   .ingredients {
-    width: 10em;
-    min-width: 10em;
+    flex-basis: 11em;
 
     .cleanUpButton{
       display: block;
@@ -38,17 +38,6 @@
       .ingredientsName {
 
       }
-    }
-  }
-
-  .description {
-    //background-color: hsla(0, 0%, 90%, 1);
-    //margin-top: -1em;
-    //padding: 2em;
-    &:first-letter {
-      text-transform: uppercase;
-      font-size: 25px;
-      font-weight: bold;
     }
   }
 }

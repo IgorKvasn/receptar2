@@ -27,6 +27,7 @@
     "bulma": "^0.9.3",
     "chroma-js": "^2.1.2",
     "cors": "^2.8.5",
+    "draft-js": "^0.11.7",
     "express": "^4.17.1",
     "express-basic-auth": "^1.2.0",
     "mongoose": "^6.0.11",

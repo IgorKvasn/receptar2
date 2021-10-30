@@ -40,7 +40,6 @@ export async function findUserByUsernameAndPass(
   login: string,
   password: string
 ): Promise<DbUser | null> {
-  debugger;
   let user = await UsersModel.findOne()
     .where('login')
     .regex(new RegExp(login, 'i'));

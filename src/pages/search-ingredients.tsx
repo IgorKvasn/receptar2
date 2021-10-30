@@ -23,9 +23,9 @@ export interface SearchIngredientsResult {
   found: string[];
 }
 
-type IngredientType = { value: string; label: string };
+export type IngredientType = { value: string; label: string };
 
-const colourStyles: StylesConfig<IngredientType> = {
+export const selectColourStyles: StylesConfig = {
   option: (styles, { data, isDisabled, isFocused, isSelected }) => {
     return {
       ...styles,
@@ -128,7 +128,7 @@ export default function SearchIngredients({}: SearchIngredientsProps) {
               className={styles.searchBox}
               classNamePrefix='select'
               onChange={(selectedOption) => onIngredientChanged(selectedOption)}
-              styles={colourStyles}
+              styles={selectColourStyles}
             />
             <div className={styles.buttonWrapper}>
               <button className='button is-primary' onClick={() => onSearch()}>

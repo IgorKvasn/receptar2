@@ -16,6 +16,9 @@ import {
 import { PayloadAction } from '@reduxjs/toolkit';
 import { useAfterReduxMutate } from '../../../utils/hooks';
 import { RecipeHeader } from '../../../components/recipe/header';
+import { AddIngredientDialog } from '../../../components/addIngredientDialog/AddIngredientDialog';
+import { Ingredient } from '../../../objects/ingredient';
+import { RecipeDescription } from '../../../components/recipe-description/RecipeDescription';
 
 export const NEW_RECIPE_PAGE = 'new';
 
@@ -25,6 +28,9 @@ export default function ReceptarDetail({}: ReceptarDetailProps) {
   const { recipe } = useAppSelector((state) => state.recipeDetail);
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
+  const [editingIngredient, setEditingIngredient] = useState<Ingredient | null>(
+    null
+  );
   const router = useRouter();
   const { recipeId } = router.query;
   const [recipeModel, setRecipeModel] = useState<Recipe>();
@@ -71,21 +77,34 @@ export default function ReceptarDetail({}: ReceptarDetailProps) {
     mutateRecipe(setRecipeRating(rating));
   }
 
-  function addIngredient() {
-    alert('TODO pridavanie suroviny');
+  function openAddIngredient(ing: Ingredient) {
+    setEditingIngredient(ing);
   }
+
+  function addIngredient(newIngr: Ingredient) {
+    alert('adding new ingredient...' + JSON.stringify(newIngr));
+    setEditingIngredient(null);
+  }
+
+  useEffect(() => {
+    if (!!editingIngredient) {
+      document.querySelector('html').classList.add('is-clipped');
+    } else {
+      document.querySelector('html').classList.remove('is-clipped');
+    }
+  }, [editingIngredient]);
 
   return (
     <>
       {!isNewRecipe() && loading ? 'loading' : 'not loading'}
 
       {recipeModel && (
-        <>
+        <div className={styles.recipeDetailWrapper}>
           <div className={styles.recipeName}>
             <RecipeHeader
               value={recipeModel.name}
               editable={isNewRecipe()}
-              onConfirm={(value) => alert('saving header' + value)}
+              onConfirm={(value) => alert('saving header: ' + value)}
             ></RecipeHeader>
             {!isNewRecipe() && (
               <Rating
@@ -139,7 +158,7 @@ export default function ReceptarDetail({}: ReceptarDetailProps) {
               )}
               {isNewRecipe() && (
                 <button
-                  onClick={() => addIngredient()}
+                  onClick={() => openAddIngredient(new Ingredient())}
                   className={`button is-primary ${styles.cleanUpButton}`}
                 >
                   <span className='icon'>
@@ -149,11 +168,21 @@ export default function ReceptarDetail({}: ReceptarDetailProps) {
                 </button>
               )}
             </div>
-            <div className={`${styles.description} box`}>
-              {recipeModel.description}
-            </div>
+
+            <RecipeDescription
+              value={recipeModel.description}
+              editable={isNewRecipe()}
+              onConfirm={(descr) => alert('saving secription: ' + descr)}
+            />
           </div>
-        </>
+
+          <AddIngredientDialog
+            visible={!!editingIngredient}
+            onIngrCreated={addIngredient}
+            onCancel={() => setEditingIngredient(null)}
+            ingredient={editingIngredient}
+          />
+        </div>
       )}
     </>
   );

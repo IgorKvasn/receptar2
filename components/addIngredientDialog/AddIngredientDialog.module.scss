@@ -1,0 +1,12 @@
+@use '../../styles/variables';
+
+.addIngrDialog{
+  :global(.modal-card-body) {
+    overflow: unset !important;
+  }
+  :global(.modal-card){
+    overflow: visible !important;
+  }
+}
+
+
