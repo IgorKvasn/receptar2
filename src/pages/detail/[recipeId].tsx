@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import styles from '../../../styles/detail.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Recipe, RecipeRating } from '../../../objects/recipe';
+import { RecipeRating } from '../../../objects/recipe';
 import { getApiUrl } from '../../../utils/config';
 import { useRouter } from 'next/dist/client/router';
 import { Rating } from '../../../components/rating/Rating';
@@ -10,15 +10,17 @@ import { useAppDispatch, useAppSelector } from '../../redux/redux-hooks';
 import {
   clearIngredients,
   setRecipe,
+  setRecipeDescription,
+  setRecipeHeader,
   setRecipeRating,
   toggleIngredient
 } from '../../redux/slices/recipeDetailSlice';
-import { PayloadAction } from '@reduxjs/toolkit';
 import { useAfterReduxMutate } from '../../../utils/hooks';
 import { RecipeHeader } from '../../../components/recipe/header';
 import { AddIngredientDialog } from '../../../components/addIngredientDialog/AddIngredientDialog';
-import { Ingredient } from '../../../objects/ingredient';
 import { RecipeDescription } from '../../../components/recipe-description/RecipeDescription';
+import { Ingredient, Recipe } from '@prisma/client';
+import { RecipeWithIngredients } from '../../../server/db';
 
 export const NEW_RECIPE_PAGE = 'new';
 
@@ -33,11 +35,9 @@ export default function ReceptarDetail({}: ReceptarDetailProps) {
   );
   const router = useRouter();
   const { recipeId } = router.query;
-  const [recipeModel, setRecipeModel] = useState<Recipe>();
 
   const mutateRecipe = useAfterReduxMutate(() => {
     axios.put(getApiUrl(`/recipes/${recipeId}`), recipe).then((response) => {});
-    setRecipeModel(recipe);
   }, [recipe]);
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export default function ReceptarDetail({}: ReceptarDetailProps) {
     }
 
     if (isNewRecipe()) {
-      setRecipeModel(new Recipe());
+      dispatch(setRecipe({ ingredients: [] } as RecipeWithIngredients));
       return;
     }
 
@@ -77,12 +77,26 @@ export default function ReceptarDetail({}: ReceptarDetailProps) {
     mutateRecipe(setRecipeRating(rating));
   }
 
-  function openAddIngredient(ing: Ingredient) {
+  function onHeaderSaved(value: string) {
+    mutateRecipe(setRecipeHeader(value));
+  }
+
+  function onDescriptionSaved(value: string) {
+    mutateRecipe(setRecipeDescription(value));
+  }
+
+  function openAddIngredient(ing: Ingredient | null) {
     setEditingIngredient(ing);
   }
 
   function addIngredient(newIngr: Ingredient) {
     alert('adding new ingredient...' + JSON.stringify(newIngr));
+    setEditingIngredient(null);
+  }
+
+  function deleteIngredient(ingr: Ingredient) {
+    alert('deleting new ingredient...' + JSON.stringify(ingr));
+    ingr.recipeId = null; //this is neccessary for backend to recognise this operation as deleting
     setEditingIngredient(null);
   }
 
@@ -98,17 +112,17 @@ export default function ReceptarDetail({}: ReceptarDetailProps) {
     <>
       {!isNewRecipe() && loading ? 'loading' : 'not loading'}
 
-      {recipeModel && (
+      {recipe && (
         <div className={styles.recipeDetailWrapper}>
           <div className={styles.recipeName}>
             <RecipeHeader
-              value={recipeModel.name}
-              editable={isNewRecipe()}
-              onConfirm={(value) => alert('saving header: ' + value)}
+              value={recipe.name}
+              editable={true}
+              onConfirm={(value) => onHeaderSaved(value)}
             ></RecipeHeader>
             {!isNewRecipe() && (
               <Rating
-                rating={recipeModel.rating}
+                rating={recipe.rating}
                 editable={true}
                 onRatingSelected={(rating) => onRatingSelected(rating)}
               />
@@ -118,12 +132,12 @@ export default function ReceptarDetail({}: ReceptarDetailProps) {
           <div className={styles.recipeDetail}>
             <div className={styles.ingredients}>
               <ul className={`fa-ul`}>
-                {recipeModel.ingredients.map((ingr, ingrIndex) => {
+                {recipe.ingredients.map((ingr, ingrIndex) => {
                   return (
                     <li
                       className={styles.ingredientItem}
                       key={`${ingr.amount}-${ingr.unit}-${ingr.name}`}
-                      onClick={() => ingredientClicked(recipeModel, ingrIndex)}
+                      onClick={() => ingredientClicked(recipe, ingrIndex)}
                     >
                       {ingr.selected ? (
                         <FontAwesomeIcon
@@ -158,7 +172,7 @@ export default function ReceptarDetail({}: ReceptarDetailProps) {
               )}
               {isNewRecipe() && (
                 <button
-                  onClick={() => openAddIngredient(new Ingredient())}
+                  onClick={() => openAddIngredient(null)}
                   className={`button is-primary ${styles.cleanUpButton}`}
                 >
                   <span className='icon'>
@@ -170,9 +184,9 @@ export default function ReceptarDetail({}: ReceptarDetailProps) {
             </div>
 
             <RecipeDescription
-              value={recipeModel.description}
-              editable={isNewRecipe()}
-              onConfirm={(descr) => alert('saving secription: ' + descr)}
+              value={recipe.description}
+              editable={true}
+              onConfirm={(descr) => onDescriptionSaved(descr)}
             />
           </div>
 
@@ -180,6 +194,7 @@ export default function ReceptarDetail({}: ReceptarDetailProps) {
             visible={!!editingIngredient}
             onIngrCreated={addIngredient}
             onCancel={() => setEditingIngredient(null)}
+            onIngrDeleted={deleteIngredient}
             ingredient={editingIngredient}
           />
         </div>

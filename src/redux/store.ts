@@ -1,13 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit';
 import recipesReducer from './slices/recipesSlice';
 import recipeDetailReducer from './slices/recipeDetailSlice';
+import userReducer from './slices/userSlice';
 
 import thunk from 'redux-thunk';
 
 export const store = configureStore({
   reducer: {
     recipes: recipesReducer,
-    recipeDetail: recipeDetailReducer
+    recipeDetail: recipeDetailReducer,
+    loggedUser: userReducer
   },
   middleware: [thunk]
 });

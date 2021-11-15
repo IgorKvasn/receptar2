@@ -1,8 +1,15 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
 import styles from './RecipeDescription.module.scss';
-import { Editor, EditorState } from 'draft-js';
-import 'draft-js/dist/Draft.css';
+import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+import { ContentState, convertToRaw, EditorState } from 'draft-js';
+import dynamic from 'next/dynamic';
+import { EditorProps } from 'react-draft-wysiwyg';
+import draftToHtml from 'draftjs-to-html';
+const Editor = dynamic<EditorProps>(
+  () => import('react-draft-wysiwyg').then((mod) => mod.Editor),
+  { ssr: false }
+);
 
 export interface RecipeDescriptionProps {
   value: string;
@@ -17,25 +24,68 @@ export function RecipeDescription({
 }: RecipeDescriptionProps) {
   const [editing, setEditing] = useState(false);
   const [editorState, setEditorState] = useState(() =>
-    EditorState.createEmpty()
+    EditorState.createWithContent(ContentState.createFromText(value))
   );
 
   function confirmEditing() {
-    alert('TODO confirm editing');
+    onConfirm(draftToHtml(convertToRaw(editorState.getCurrentContent())));
+    setEditing(false);
   }
 
   function cancelEditing() {
-    alert('TODO cancel editing');
+    setEditorState(
+      EditorState.createWithContent(ContentState.createFromText(value))
+    );
+    setEditing(false);
+  }
+
+  function onEditorStateChange(editorState) {
+    setEditorState(editorState);
   }
 
   return (
     <div className={`${styles.description} box`}>
       {!editable && value}
-
-      {editing && (
-        <Editor editorState={editorState} onChange={setEditorState} />
-      )}
-
+      <div className={styles.textDescription}>
+        {editing && (
+          <Editor
+            editorState={editorState}
+            onEditorStateChange={(s) => onEditorStateChange(s)}
+            toolbar={{
+              options: [
+                'inline',
+                'list',
+                'textAlign',
+                'link',
+                'image',
+                'history'
+              ],
+              inline: {
+                inDropdown: false,
+                options: [
+                  'bold',
+                  'italic',
+                  'underline',
+                  'strikethrough',
+                  'superscript',
+                  'subscript'
+                ]
+              },
+              list: { inDropdown: true },
+              textAlign: { inDropdown: true },
+              link: { inDropdown: true },
+              history: { inDropdown: true }
+            }}
+          />
+        )}
+        {!editing && (
+          <div
+            dangerouslySetInnerHTML={{
+              __html: value
+            }}
+          />
+        )}
+      </div>
       {editable && (
         <div className={styles.buttonWrapper}>
           {editing && (

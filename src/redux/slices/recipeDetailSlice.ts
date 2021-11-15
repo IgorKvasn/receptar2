@@ -23,6 +23,12 @@ export const recipesSlice = createSlice({
     setRecipeRating: (state, action: PayloadAction<RecipeRating>) => {
       state.recipe.rating = action.payload;
     },
+    setRecipeHeader: (state, action: PayloadAction<string>) => {
+      state.recipe.name = action.payload;
+    },
+    setRecipeDescription: (state, action: PayloadAction<string>) => {
+      state.recipe.description = action.payload;
+    },
     toggleIngredient: (state, action: PayloadAction<number>) => {
       state.recipe.ingredients[action.payload].selected =
         !state.recipe.ingredients[action.payload].selected;
@@ -36,6 +42,8 @@ export const recipesSlice = createSlice({
 export const {
   setRecipe,
   setRecipeRating,
+  setRecipeHeader,
+  setRecipeDescription,
   toggleIngredient,
   clearIngredients
 } = recipesSlice.actions;

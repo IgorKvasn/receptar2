@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './AddIngredientDialog.module.scss';
-import { Ingredient, IngredientUnit } from '../../objects/ingredient';
+import { IngredientUnit } from '../../objects/ingredient';
 import Select from 'react-select';
 import axios from 'axios';
 import { getApiUrl } from '../../utils/config';
@@ -10,10 +10,13 @@ import {
   selectColourStyles
 } from '../../src/pages/search-ingredients';
 import CreatableSelect from 'react-select/creatable';
+import { Ingredient } from '@prisma/client';
+import { copyObj } from '../../utils/utils';
 
 export interface AddIngredientDialogProps {
   visible: boolean;
   onIngrCreated: (newIngr: Ingredient) => void;
+  onIngrDeleted: (ingr: Ingredient) => void;
   onCancel: () => void;
   ingredient: Ingredient | null;
 }
@@ -21,6 +24,7 @@ export interface AddIngredientDialogProps {
 export function AddIngredientDialog({
   visible,
   onIngrCreated,
+  onIngrDeleted,
   onCancel,
   ingredient
 }: AddIngredientDialogProps) {
@@ -28,7 +32,7 @@ export function AddIngredientDialog({
   const [loading, setLoading] = useState(false);
   const amountRef = useRef<HTMLInputElement>();
   const ingr = useRef<Ingredient>(
-    !!ingredient ? ingredient.copy() : new Ingredient()
+    !!ingredient ? copyObj(ingredient) : ({} as Ingredient)
   );
   const [ingrName, setIngrName] = useState<IngredientType>({
     value: ingr.current.name,
@@ -53,6 +57,10 @@ export function AddIngredientDialog({
   function onConfirm() {
     ingr.current!.amount = Number(amountRef.current!.value);
     onIngrCreated(ingr.current!);
+  }
+
+  function onDelete() {
+    onIngrDeleted(ingr.current!);
   }
 
   return (
@@ -124,6 +132,9 @@ export function AddIngredientDialog({
         <div className='modal-card-foot'>
           <button className='button is-success' onClick={() => onConfirm()}>
             Pridať
+          </button>
+          <button className='button is-danger' onClick={() => onDelete()}>
+            Vymazať
           </button>
           <button className='button' onClick={() => onCancel()}>
             Zrušiť

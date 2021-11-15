@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import styles from '../../styles/index.module.scss';
-import { Recipe } from '../../objects/recipe';
 import { getApiUrl } from '../../utils/config';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useRouter } from 'next/dist/client/router';
@@ -10,6 +9,7 @@ import { useAppDispatch, useAppSelector } from '../redux/redux-hooks';
 import { addAllRecipes, reorderRecipes } from '../redux/slices/recipesSlice';
 import { formatDate } from '../../utils/date-utils';
 import { NEW_RECIPE_PAGE } from './detail/[recipeId]';
+import { Recipe } from '@prisma/client';
 
 interface ReceptarListProps {}
 

@@ -1,50 +1,48 @@
-import mongoose, { Schema, Types } from 'mongoose';
-import { Recipe, RecipeRating } from '../objects/recipe';
-import { User } from '../objects/User';
-import { Ingredient } from '../objects/ingredient';
-
-const UsersSchema = new Schema({
-  login: { type: String, required: true },
-  password: { type: String, required: true }
-});
-
-const RecipesSchema = new Schema({
-  author: { type: String, required: true },
-  id: { type: String, required: true },
-  name: { type: String, required: true },
-  rating: { type: Number },
-  description: { type: String },
-  ingredients: [
-    //Ingredient[]
-    { name: String, amount: Number, unit: String, selected: Boolean }
-  ],
-  createDate: { type: Date, required: true }
-});
-
-export interface DbUser extends Document {
-  login: string;
-  password: string;
-  id: string;
-}
-
-export interface DbRecipe extends Document, Recipe {
-  author: string;
-}
-
-const UsersModel = mongoose.model('Users', UsersSchema);
-const RecipeModel = mongoose.model('Recipes', RecipesSchema);
+import { Ingredient, Prisma, Recipe, User } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 const bcrypt = require('bcrypt');
+const prisma = new PrismaClient({
+  log: [
+    {
+      emit: 'event',
+      level: 'query'
+    },
+    {
+      emit: 'stdout',
+      level: 'error'
+    },
+    {
+      emit: 'stdout',
+      level: 'info'
+    },
+    {
+      emit: 'stdout',
+      level: 'warn'
+    }
+  ]
+});
+prisma.$on('query', (e) => {
+  console.log('Query: ' + e.query);
+  console.log('Params:', e.params);
+  // console.log('Duration: ' + e.duration + 'ms');
+});
 
 export async function findUserByUsernameAndPass(
   login: string,
   password: string
-): Promise<DbUser | null> {
-  let user = await UsersModel.findOne()
-    .where('login')
-    .regex(new RegExp(login, 'i'));
+): Promise<User | null> {
+  let user = await prisma.user.findFirst({
+    where: {
+      name: login.toLowerCase()
+    }
+  });
 
-  return new Promise<DbUser>((resolve, reject) => {
+  return new Promise<User | null>((resolve, reject) => {
+    if (user === null) {
+      resolve(null);
+    }
+
     bcrypt.compare(password, user.password, function (err, result) {
       if (err) {
         reject(err);
@@ -61,42 +59,128 @@ export async function findUserByUsernameAndPass(
 
 export type SortInfo = { property: string; direction: 'ASC' | 'DESC' | 'null' };
 
-function generateSortString(sortDef: SortInfo[] | null): string | null {
-  if (!sortDef) {
-    return '';
-  }
-  return sortDef
-    .filter(
-      (s) =>
+export async function findRecipesForUser(
+  userName: string,
+  sortDef: SortInfo[] | null,
+  ingredients?: string[]
+): Promise<Recipe[]> {
+  let sortObj = {
+    createDate: 'desc'
+  } as Prisma.Enumerable<Prisma.RecipeOrderByWithRelationInput>;
+
+  if (sortDef !== null) {
+    sortDef.forEach((s) => {
+      if (
         !!s.direction &&
         !!s.property &&
         s.direction !== 'null' &&
         s.property !== 'null'
-    )
-    .map((s) => {
-      return `${s.direction === 'DESC' ? '-' : ''}${s.property}`;
-    })
-    .join(' ');
+      ) {
+        sortObj[s.property] = s.direction.toLowerCase();
+      }
+    });
+  }
+
+  if (!ingredients || ingredients.length === 0) {
+    return await prisma.recipe.findMany({
+      where: {
+        authorName: userName
+      },
+      orderBy: sortObj
+    });
+  } else {
+    return await prisma.recipe.findMany({
+      where: {
+        authorName: userName,
+        ingredients: {
+          some: {
+            name: {
+              in: ingredients
+            }
+          }
+        }
+      },
+      orderBy: sortObj,
+      include: {
+        ingredients: true
+      }
+    });
+  }
 }
 
-export async function findRecipesForUser(
-  username: string,
-  sortDef: SortInfo[] | null
-): Promise<DbRecipe[]> {
-  let sortString = `${generateSortString(sortDef)} id`.trim();
-
-  let recipes = await RecipeModel.find()
-    .where('author')
-    .equals(username)
-    .sort(sortString);
-  return recipes;
+export async function findRecipeById(
+  userName: string,
+  recipeId: number
+): Promise<Recipe> {
+  return await prisma.recipe.findFirst({
+    where: {
+      id: recipeId,
+      authorName: userName
+    },
+    include: {
+      ingredients: true
+    }
+  });
 }
 
-export async function findAllUsers(): Promise<Array<DbUser>> {
-  let users = await UsersModel.find({});
-  return users;
+export async function findIngredients(
+  userName: string
+): Promise<{ name: string }[]> {
+  let ingredientNames =
+    await prisma.$queryRaw`select i.name from "Ingredient" i join "Recipe" r ON r.id = i."recipeId" where r."authorName"=${userName}`;
+  return ingredientNames as { name: string }[];
 }
 
-export async function createRecipe(recipe: Recipe) {
-  //TODO
+export async function findAllUsers(): Promise<Array<User>> {
+  return await prisma.user.findMany();
+}
+
+export async function createRecipe(
+  userName: string,
+  recipe: Recipe
+): Promise<Recipe> {
+  recipe.authorName = userName;
+  return await prisma.recipe.create({ data: recipe });
+}
+
+export type RecipeWithIngredients = Recipe & { ingredients: Ingredient[] };
+
+export async function updateRecipe(
+  userName: string,
+  recipeId: number,
+  recipe: RecipeWithIngredients
+): Promise<any> {
+  let ingredientsQuery = recipe.ingredients.map((ingr) => {
+    if (ingr.id === null || typeof ingr.id === 'undefined') {
+      return prisma.ingredient.create({
+        data: ingr
+      });
+    } else {
+      if (ingr.recipeId === null || typeof ingr.recipeId === 'undefined') {
+        return prisma.ingredient.delete({
+          where: {
+            id: ingr.id
+          }
+        });
+      }
+      return prisma.ingredient.update({
+        where: {
+          id: ingr.id
+        },
+        data: ingr
+      });
+    }
+  });
+
+  delete recipe['ingredients'];
+
+  return await prisma.$transaction([
+    prisma.recipe.update({
+      where: {
+        id: recipeId
+      },
+      data: recipe as Recipe
+    }),
+    ...ingredientsQuery
+  ]);
 }

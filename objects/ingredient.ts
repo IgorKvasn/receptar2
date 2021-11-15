@@ -7,6 +7,7 @@ export enum IngredientUnit {
   HANDFUL = 'handful'
 }
 
+/*
 export class Ingredient {
   name: string;
   amount: number;
@@ -17,3 +18,4 @@ export class Ingredient {
     return JSON.parse(JSON.stringify(this));
   }
 }
+*/

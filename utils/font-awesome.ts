@@ -18,7 +18,8 @@ import {
   faPlus as fasPlus,
   faCheck as fasCheck,
   faTimes as fasTimes,
-  faPen as fasPen
+  faPen as fasPen,
+  faSignOutAlt as fasSignOutAlt
 } from '@fortawesome/free-solid-svg-icons';
 
 // See https://github.com/FortAwesome/react-fontawesome#integrating-with-other-tools-and-frameworks
@@ -58,5 +59,6 @@ library.add(
   fasPlus,
   fasCheck,
   fasTimes,
-  fasPen
+  fasPen,
+  fasSignOutAlt
 );

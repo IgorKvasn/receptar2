@@ -13,8 +13,9 @@ import styles from '../../styles/search-ingredients.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Rating } from '../../components/rating/Rating';
 import { formatDate } from '../../utils/date-utils';
-import { Recipe } from '../../objects/recipe';
 import { useRouter } from 'next/dist/client/router';
+import { Recipe } from '@prisma/client';
+import { RecipeRating } from '../../objects/recipe';
 
 export interface SearchIngredientsProps {}
 
@@ -94,7 +95,7 @@ export default function SearchIngredients({}: SearchIngredientsProps) {
       .join('&');
 
     axios
-      .get(getApiUrl(`/recipes?${queryParams}`))
+      .get(getApiUrl(`/recipes/ingredients?${queryParams}`))
       .then((response: AxiosResponse<SearchIngredientsResult[]>) => {
         let lastAllIngredientsTemp = -1;
 
@@ -127,7 +128,9 @@ export default function SearchIngredients({}: SearchIngredientsProps) {
               options={ingredients}
               className={styles.searchBox}
               classNamePrefix='select'
-              onChange={(selectedOption) => onIngredientChanged(selectedOption)}
+              onChange={(
+                selectedOption: IngredientType | MultiValue<IngredientType>
+              ) => onIngredientChanged(selectedOption)}
               styles={selectColourStyles}
             />
             <div className={styles.buttonWrapper}>
@@ -171,7 +174,7 @@ export default function SearchIngredients({}: SearchIngredientsProps) {
                       <td>{result.recipe.name}</td>
                       <td>{result.found.join(', ')}</td>
                       <td>
-                        <Rating rating={result.recipe.rating} />
+                        <Rating rating={result.recipe.rating as RecipeRating} />
                       </td>
                       <td>{formatDate(result.recipe.createDate)}</td>
                     </tr>

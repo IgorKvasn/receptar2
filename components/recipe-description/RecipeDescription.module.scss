@@ -21,7 +21,7 @@
   position: relative;
   display: flex;
   padding-right: 0;
-  justify-content: right;
+  justify-content: left;
 
   //background-color: hsla(0, 0%, 90%, 1);
   //margin-top: -1em;
@@ -36,5 +36,9 @@
     position: absolute;
     top: 1em;
     right: 0;
+  }
+
+  .textDescription{
+    flex-grow: 1;
   }
 }

@@ -1,8 +1,6 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import next from 'next';
-import mongoose from 'mongoose';
-import basicAuth from 'express-basic-auth';
 import { auth } from './auth';
 
 const dev = process.env.NODE_ENV !== 'production';
@@ -24,33 +22,10 @@ const port = process.env.PORT || 3000;
 
     server.use(cors());
 
-    server.use(
-      basicAuth({
-        authorizer: auth,
-        authorizeAsync: true,
-        challenge: true,
-        realm: 'ReceptarRealm'
-      })
-    );
-
     server.use('/api', require('./api'));
 
     server.all('*', (req: Request, res: Response) => {
       return handle(req, res);
-    });
-
-    //init DB
-    let url = process.env.DATABASE_URL;
-    await mongoose.connect(url);
-    console.log('DB connected');
-    let db = mongoose.connection;
-    db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-
-    process.on('SIGINT', function () {
-      mongoose.connection.close(function () {
-        console.log('Mongoose disconnected on app termination');
-        process.exit(0);
-      });
     });
 
     //--------

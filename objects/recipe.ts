@@ -1,7 +1,8 @@
-import { Ingredient } from './ingredient';
+// import { Ingredient } from './ingredient';
 
 export type RecipeRating = 0 | 1 | 2 | 3 | 4 | 5;
 
+/*
 export class Recipe {
   id: string;
   name: string;
@@ -10,3 +11,4 @@ export class Recipe {
   ingredients: Ingredient[] = [];
   createDate: Date;
 }
+*/
