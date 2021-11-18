@@ -16,7 +16,7 @@ import {
   toggleIngredient
 } from '../../redux/slices/recipeDetailSlice';
 import { useAfterReduxMutate } from '../../../utils/hooks';
-import { RecipeHeader } from '../../../components/recipe/header';
+import { RecipeHeader } from '../../../components/recipe-header/recipe-header';
 import { AddIngredientDialog } from '../../../components/addIngredientDialog/AddIngredientDialog';
 import { RecipeDescription } from '../../../components/recipe-description/RecipeDescription';
 import { Ingredient, Recipe } from '@prisma/client';

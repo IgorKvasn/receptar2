@@ -6,7 +6,7 @@ import '../../utils/font-awesome';
 import { store } from '../redux/store';
 import axios from 'axios';
 import { useRouter } from 'next/router';
-import { RouteGuard } from '../../components/ route-guard/ RouteGuard';
+import { RouteGuard } from '../../components/route-guard/ RouteGuard';
 import { useAppDispatch, useAppSelector } from '../redux/redux-hooks';
 import {
   LOGGED_COOKIE_NAME,

@@ -1,14 +1,14 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
-import styles from './Header.module.scss';
+import styles from './layout-header.module.scss';
 import Link from 'next/link';
 import { useAppDispatch, useAppSelector } from '../../src/redux/redux-hooks';
 import { logoutUser } from '../../src/redux/slices/userSlice';
 import { useRouter } from 'next/router';
 
-export interface HeaderProps {}
+export interface LayoutHeaderProps {}
 
-export function Header({}: HeaderProps) {
+export function LayoutHeader({}: LayoutHeaderProps) {
   const { loggedUser } = useAppSelector((state) => state.loggedUser);
 
   return (
@@ -65,7 +65,7 @@ function LogoutUser({ loggedUser }) {
           onClick={(e) => onLogout(e)}
         >
           <FontAwesomeIcon icon={['fas', 'sign-out-alt']} />
-          Odhlásiť{' '}
+          Odhlásiť
           <span className={styles.loggedUsername}>{loggedUser.username}</span>
         </a>
       )}

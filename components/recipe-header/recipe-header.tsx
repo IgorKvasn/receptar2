@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useRef, useState } from 'react';
-import styles from './Header.module.scss';
+import styles from './recipe-header.module.scss';
 
 const DEFAULT_VALUE = 'Názov receptu';
 
